@@ -1,0 +1,4 @@
+﻿  ClientT.cpp
+  The contents of <charconv> are available only with C++17 or later.
+D:\Stud\Networks\sem_5\Lab_2\ClientT\ClientT.cpp(45,5): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  ClientT.vcxproj -> D:\Stud\Networks\sem_5\Lab_2\x64\Debug\ClientT.exe
