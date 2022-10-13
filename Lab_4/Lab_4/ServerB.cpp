@@ -80,10 +80,10 @@ int main()
 			char resTimeout[5] = "1000";
 			setsockopt(sS, SOL_SOCKET, SO_RCVTIMEO, resTimeout, sizeof(resTimeout));
 
-			if ((lenobuf = sendto(sS, serverName, sizeof(serverName), NULL, (sockaddr*)&all, sizeof(all))) == SOCKET_ERROR)
-				throw  SetErrorMsgText("sendto_all:", WSAGetLastError());
-			if (libuf = recvfrom(sS, msgFromAnotherServers, sizeof(msgFromAnotherServers), NULL, (sockaddr*)&serv, &lserv) == SOCKET_ERROR)
-				throw SetErrorMsgText("recvfrom:", WSAGetLastError());
+			//if ((lenobuf = sendto(sS, serverName, sizeof(serverName), NULL, (sockaddr*)&all, sizeof(all))) == SOCKET_ERROR)
+			//	throw  SetErrorMsgText("sendto_all:", WSAGetLastError());
+			//if (libuf = recvfrom(sS, msgFromAnotherServers, sizeof(msgFromAnotherServers), NULL, (sockaddr*)&serv, &lserv) == SOCKET_ERROR)
+			//	throw SetErrorMsgText("recvfrom:", WSAGetLastError());
 
 
 
@@ -97,12 +97,12 @@ int main()
 			//		throw  SetErrorMsgText("recv:", WSAGetLastError());
 			//	}
 			//}
-			if (strcmp(msgFromAnotherServers, serverName) == 0) {
-				std::cout << "Server with this sign is already exists\n";
-				system("pause");
-				return false;
-			}
-			std::cout << serv.sin_port;
+			//if (strcmp(msgFromAnotherServers, serverName) == 0) {
+			//	std::cout << "Server with this sign is already exists\n";
+			//	system("pause");
+			//	return false;
+			//}
+			//std::cout << serv.sin_port;
 		}
 
 		///////
@@ -118,8 +118,8 @@ int main()
 		}
 	}
 	catch (std::string errorMsgText) { 
-		std::cout << errorMsgText;
-		return false; 
+		std::cout << "Server is already exists...";
+		//return false; 
 	}
 	system("pause");
 	return 0;
