@@ -19,15 +19,17 @@ WSADATA wsaData;	//структура для хранения данных о WS
 SOCKET sS;			//дескриптор сокета сервера
 SOCKADDR_IN serv;	//параметры сокета сервера
 SOCKADDR_IN clnt;	//параметры сокета клиента
+SOCKADDR_IN all;
+
 int lclnt;
+int lenall;
 
 
 char ibuf[50], obuf[50];
 int libuf = 0, lobuf = 0;
 
-char serverName[20];
+char serverName[50];
 int portNumber;
-
 
 clock_t start, stop;
 
@@ -35,15 +37,15 @@ clock_t start, stop;
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	std::cout << "Enter server name:\t";
+	std::cout << "Enter server call sign:\t";
 	std::cin >> serverName;
 	std::cout << "Enter port number to start:\t";
 	std::cin >> portNumber;
 	std::cout << "Server " << serverName <<" started on port " << portNumber << "\n\n";
 
-	serv.sin_family = AF_INET;               // используется IP-адресация  
-	serv.sin_port = htons(portNumber);             // порт 2000
-	serv.sin_addr.s_addr = INADDR_ANY; // всем 
+	serv.sin_family = AF_INET;						// используется IP-адресация  
+	serv.sin_port = htons(portNumber);              // порт 2000
+	serv.sin_addr.s_addr = INADDR_ANY;				// всем 
 
 	memset(&clnt, 0, sizeof(clnt));
 	int lenclnt = sizeof(clnt);
@@ -58,23 +60,57 @@ int main()
 		if (bind(sS, (LPSOCKADDR)&serv, sizeof(serv)) == SOCKET_ERROR)		//бинд нового сокета на 2000 TCP
 			throw SetErrorMsgText("bind:", WSAGetLastError());
 
-		//for broadcast
+		////////////on start for broadcast
 		try {
-			serv.sin_addr.s_addr = INADDR_BROADCAST; // всем 
-			int lenobuf;
-			char servAnswer[50];
-
-			char resTimeout[5] = "1000";
-			setsockopt(sS, SOL_SOCKET, SO_RCVTIMEO, resTimeout, sizeof(resTimeout));
+			all.sin_family = AF_INET;						// используется IP-адресация  
+			all.sin_port = htons(portNumber);              // порт кастомный
+			all.sin_addr.s_addr = INADDR_BROADCAST;
+			//////////
 			int optval = 1;
 			if (setsockopt(sS, SOL_SOCKET, SO_BROADCAST, (char*)&optval, sizeof(int)) == SOCKET_ERROR)
 				throw  SetErrorMsgText("setsockopt:", WSAGetLastError());
-			if (libuf = recvfrom(sS, servAnswer, sizeof(servAnswer), NULL, (sockaddr*)&serv, &lenclnt) == SOCKET_ERROR)
-				throw SetErrorMsgText("recvfrom:", WSAGetLastError());
-			std::cout << servAnswer;
-		}
-		catch (std::string errorMsgText) { return false; }
+			//if (bind(sS, (LPSOCKADDR)&all, sizeof(all)) == SOCKET_ERROR)		//бинд нового сокета на 2000 TCP
+			//	throw SetErrorMsgText("bind:", WSAGetLastError());
+			//////////
+			int lserv = sizeof(serv);
+			//serv.sin_addr.s_addr = INADDR_BROADCAST; // всем 
+			int lenobuf;
+			char msgFromAnotherServers[50];
 
+			char resTimeout[5] = "1000";
+			setsockopt(sS, SOL_SOCKET, SO_RCVTIMEO, resTimeout, sizeof(resTimeout));
+
+			if ((lenobuf = sendto(sS, serverName, sizeof(serverName), NULL, (sockaddr*)&all, sizeof(all))) == SOCKET_ERROR)
+				throw  SetErrorMsgText("sendto_all:", WSAGetLastError());
+			if (libuf = recvfrom(sS, msgFromAnotherServers, sizeof(msgFromAnotherServers), NULL, (sockaddr*)&serv, &lserv) == SOCKET_ERROR)
+				throw SetErrorMsgText("recvfrom:", WSAGetLastError());
+
+
+
+			//{
+			//	if (WSAGetLastError() == WSAETIMEDOUT)
+			//	{
+			//		return false;
+			//	}
+			//	else
+			//	{
+			//		throw  SetErrorMsgText("recv:", WSAGetLastError());
+			//	}
+			//}
+			if (strcmp(msgFromAnotherServers, serverName) == 0) {
+				std::cout << "Server with this sign is already exists\n";
+				system("pause");
+				return false;
+			}
+			std::cout << serv.sin_port;
+		}
+
+		///////
+		catch (std::string errorMsgText) { 
+			std::cout << errorMsgText;
+		}
+		//if (bind(sS, (LPSOCKADDR)&serv, sizeof(serv)) == SOCKET_ERROR)		//бинд нового сокета на 2000 TCP
+		//	throw SetErrorMsgText("bind:", WSAGetLastError());
 		while (true) {
 			if (GetRequestFromClient(serverName, portNumber, clnt, lclnt)) {//////
 				if (!PutAnswerToClient(serverName, clnt, lclnt)) throw SetErrorMsgText("socket:", WSAGetLastError());
@@ -106,11 +142,11 @@ bool GetRequestFromClient(
 		from.sin_addr.S_un.S_addr = INADDR_ANY;	//любой собственный IP-адрес
 
 		flen = sizeof(from);
-		char clientMessage[50];
+		char clientCall[50];
 
-		if (libuf = recvfrom(sS, clientMessage, sizeof(clientMessage), NULL, (sockaddr*)&from, &flen) == SOCKET_ERROR)
+		if (libuf = recvfrom(sS, clientCall, sizeof(clientCall), NULL, (sockaddr*)&from, &flen) == SOCKET_ERROR)
 			throw SetErrorMsgText("recvfrom:", WSAGetLastError());
-		if (strcmp(name, clientMessage) == 0) {
+		if (strcmp(clientCall, name) == 0) {
 			std::cout <<"Client port:\t" << from.sin_port<<"\n";
 			std::cout << "Client ip:\t" << inet_ntoa(from.sin_addr) << "\n\n";
 			return true;
@@ -139,6 +175,8 @@ bool  PutAnswerToClient(
 	}
 
 }
+
+
 
 
 

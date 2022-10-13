@@ -45,6 +45,7 @@ int main()
 		
 		char serverName[4];
 		std::cin >> serverName;
+		GetServer(serverName, 2000, serv, lenserv);
 
 		if (closesocket(cC) == SOCKET_ERROR)			//закрываем сокет
 			throw SetErrorMsgText("closesocket:", WSAGetLastError());
