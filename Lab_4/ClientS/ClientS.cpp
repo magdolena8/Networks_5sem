@@ -131,6 +131,7 @@ bool  GetServerByName(
 			std::cout << "\nConnected\n";
 			std::cout << inet_ntoa(from.sin_addr) << "\n";
 			std::cout << from.sin_port << "\n\n";
+
 			return true;
 		}
 	}

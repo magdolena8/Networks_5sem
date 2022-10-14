@@ -27,6 +27,7 @@ int lenall;
 
 char ibuf[50], obuf[50];
 int libuf = 0, lobuf = 0;
+char hostname[18];
 
 char serverName[50];
 int portNumber;
@@ -41,7 +42,7 @@ int main()
 	std::cin >> serverName;
 	std::cout << "Enter port number to start:\t";
 	std::cin >> portNumber;
-	std::cout << "Server " << serverName <<" started on port " << portNumber << "\n\n";
+	std::cout << "Server " << serverName <<" started on port " << portNumber << "\n";
 
 	serv.sin_family = AF_INET;						// используется IP-адресация  
 	serv.sin_port = htons(portNumber);              // порт 2000
@@ -59,6 +60,8 @@ int main()
 			throw SetErrorMsgText("socket:", WSAGetLastError());
 		if (bind(sS, (LPSOCKADDR)&serv, sizeof(serv)) == SOCKET_ERROR)		//бинд нового сокета на 2000 TCP
 			throw SetErrorMsgText("bind:", WSAGetLastError());
+		gethostname(hostname, sizeof(hostname));
+		std::cout << "Server hostname:\t" <<hostname<<"\n\n";
 
 		////////////on start for broadcast
 		try {
@@ -148,7 +151,11 @@ bool GetRequestFromClient(
 			throw SetErrorMsgText("recvfrom:", WSAGetLastError());
 		if (strcmp(clientCall, name) == 0) {
 			std::cout <<"Client port:\t" << from.sin_port<<"\n";
-			std::cout << "Client ip:\t" << inet_ntoa(from.sin_addr) << "\n\n";
+			std::cout << "Client ip:\t" << inet_ntoa(from.sin_addr) << "\n";
+			struct hostent* hent;
+			hent = gethostbyaddr((char*)&from.sin_addr, 4, AF_INET);
+			std::cout<<"Client name:\t" << hent->h_name << "\n\n";
+			
 			return true;
 		}
 	}
