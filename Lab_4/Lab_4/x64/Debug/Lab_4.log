@@ -1,4 +1,0 @@
-﻿  ServerB.cpp
-D:\Stud\Networks\sem_5\Lab_4\Lab_4\ServerB.cpp(80,8): warning C4101: lenobuf: неиспользованная локальная переменная
-D:\Stud\Networks\sem_5\Lab_4\Lab_4\ServerB.cpp(81,9): warning C4101: msgFromAnotherServers: неиспользованная локальная переменная
-  Lab_4.vcxproj -> D:\Stud\Networks\sem_5\Lab_4\x64\Debug\ServerB.exe

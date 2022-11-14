@@ -1,4 +1,0 @@
-﻿  ClientNPсt.cpp
-D:\Stud\Networks\sem_5\Lab_6\ClientNPсt\ClientNPсt.cpp(16,9): warning C4101: hFile: неиспользованная локальная переменная
-D:\Stud\Networks\sem_5\Lab_6\ClientNPсt\ClientNPсt.cpp(19,20): warning C4101: wroteBytes: неиспользованная локальная переменная
-  ClientNPсt.vcxproj -> D:\Stud\Networks\sem_5\Lab_6\x64\Debug\ClientNPсt.exe

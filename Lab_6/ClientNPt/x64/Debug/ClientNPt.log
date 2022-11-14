@@ -1,3 +1,0 @@
-﻿  ClientNPt.cpp
-D:\Stud\Networks\sem_5\Lab_6\ClientNPt\ClientNPt.cpp(34,20): warning C4101: wroteBytes: неиспользованная локальная переменная
-  ClientNPt.vcxproj -> D:\Stud\Networks\sem_5\Lab_6\x64\Debug\ClientNPt.exe
