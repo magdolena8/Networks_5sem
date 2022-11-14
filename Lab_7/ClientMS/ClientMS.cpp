@@ -14,39 +14,45 @@ int main()
 {
 	setlocale(LC_ALL, "Rus");
 	HANDLE hFile;
-	
-	while (true) {
+	clock_t start, stop;
+
+	char mailSlotName[5];
+	std::cout << "Enter server name to connect\t\t";
+	std::cin >> mailSlotName;
+	std::string slotName = "\\\\.\\mailslot\\";
+	slotName += mailSlotName;
+	if ((hFile = CreateFile(std::wstring(slotName.begin(), slotName.end()).c_str(),
+		GENERIC_WRITE,					//read or write
+		FILE_SHARE_READ,				//режим совместного использования
+		NULL,							//атрибуты безопасности
+		OPEN_EXISTING,					//флаг открытия канала 
+		NULL,							// флаги и атрибуты
+		NULL)) == INVALID_HANDLE_VALUE) //доп. атрибуты
+		throw SetMailslotError("createFile", GetLastError());
+
+	DWORD wroteBytes;
+	char wbuf[300] = "Hello from Maislot-client";
+
+	start = clock();
+
+	for (int i = 0; i < 1000; i++) {
 		try
 		{
-			char mailSlotName[5];
-			std::cout << "Enter server name to connect\t\t";
-			std::cin >> mailSlotName;
-			std::string slotName = "\\\\.\\mailslot\\";
-			slotName += mailSlotName;
-			if ((hFile = CreateFile(std::wstring(slotName.begin(), slotName.end()).c_str(),
-				GENERIC_WRITE,					//read or write
-				FILE_SHARE_READ,				//режим совместного использования
-				NULL,							//атрибуты безопасности
-				OPEN_EXISTING,					//флаг открытия канала 
-				NULL,							// флаги и атрибуты
-				NULL)) == INVALID_HANDLE_VALUE) //доп. атрибуты
-				throw SetMailslotError("createFile", GetLastError());
-
-			DWORD wroteBytes;
-			char wbuf[300] = "Hello from Maislot-client";
 			if (!WriteFile(hFile,
 				wbuf,						// буфер
 				sizeof(wbuf),				// размер буфера
 				&wroteBytes,                // записано
 				NULL))
 				throw SetMailslotError("writeFile", GetLastError());
-			CloseHandle(hFile);
 		}
 		catch (std::string ErrorPipeText)
 		{
 			std::cout << std::endl << ErrorPipeText;
 		}
 	}
+	stop = clock();
+	std::cout << "\n\nTime spent:\t\t" << stop - start << "\n";
+	CloseHandle(hFile);
 	system("pause");
 }
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <atlbase.h>
+#include <ctime>
 #include <atlconv.h>
 #include <sstream>
 #include "Winsock2.h"                // заголовок  WS2_32.dll
@@ -18,13 +19,18 @@ int main()
 	setlocale(LC_ALL, "Rus");
 
 	HANDLE hMailSlot; // дескриптор канала
+	DWORD readBytes;
+	unsigned int start, stop;
+	char mailSlotName[5];
+	std::string slotName = "\\\\.\\mailslot\\";
+	char rbuf[500];
+
+
 	try
 	{
-		char mailSlotName[5];
 		std::cout << "Enter server name\t\t";
 		std::cin >> mailSlotName;
-		std::string slotName ="\\\\.\\mailslot\\";
-		slotName += mailSlotName;	
+		slotName += mailSlotName;
 		if ((hMailSlot = CreateMailslot(std::wstring(slotName.begin(), slotName.end()).c_str(),
 			500,	//message length
 			180000,  //180 000ms = 3min
@@ -32,10 +38,9 @@ int main()
 		)) == INVALID_HANDLE_VALUE)
 			throw SetMailslotError("createMailslot", GetLastError());
 
-		char rbuf[300];
-		DWORD readBytes;
 
-		while (true) {
+
+		for (int i = 0; i < 1000; i++) {
 			if (!ReadFile(hMailSlot, rbuf, sizeof(rbuf), &readBytes, NULL)) {
 				if (GetLastError() == 121) {
 					std::cout << "Timeout expired\n\n";
@@ -43,11 +48,11 @@ int main()
 				}
 				else throw SetMailslotError("readFile", GetLastError());
 			}
+			else start = clock();
 			std::cout << "New message\t\t" << rbuf << std::endl;
 		}
-
-
-
+		stop = clock();
+		std::cout << "\n\nTime spent:\t\t" << stop - start << "\n";
 		CloseHandle(hMailSlot);
 	}
 	catch (std::string ErrorMailSlotText)
